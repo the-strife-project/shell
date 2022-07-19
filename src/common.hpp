@@ -3,16 +3,16 @@
 
 #include <string>
 #include <unordered_map>
+#include <tasks>
 
 char getChar();
 std::string getLine();
 
 void initBuiltins();
 
-extern std::unordered_map<std::string, std::string> env;
+extern std::Env env;
 
-typedef std::vector<std::string> Args;
-typedef void (*Builtin)(const Args&);
+typedef void (*Builtin)(std::Args&);
 extern std::unordered_map<std::string, Builtin> builtins;
 
 #endif

@@ -38,6 +38,21 @@ extern "C" void _start() {
 			continue;
 		}
 
+		// It's not a builtin
+
+		bool isPath = false;
+		for(size_t i=0; i<program.size(); ++i) {
+			if(program[i] == '/') {
+				isPath = true;
+				break;
+			}
+		}
+
+		if(isPath) {
+			// TODO
+			continue;
+		}
+
 		// Reachable via $PATH?
 		bool reached = false;
 		auto paths = env["PATH"].split(':');
@@ -46,18 +61,16 @@ extern "C" void _start() {
 				continue;
 
 			std::string path = x + "/" + program;
-			if(std::existsFile(path)) {
+			if(std::isFile(path)) {
 				reached = true;
-
-				std::PID pid = std::run(path);
+				std::PID pid = std::run(path, parts, env);
 				auto lerr = std::getLastLoaderError();
 				if(lerr) {
-					std::printf("%s: invalid ELF: error %d\n", program.c_str(), lerr);
+					std::printf("shell: %s: invalid ELF: error %d\n", program.c_str(), lerr);
 					break;
 				}
 
 				std::wait(pid);
-
 				break;
 			}
 		}
@@ -65,7 +78,7 @@ extern "C" void _start() {
 		if(reached)
 			continue;
 
-		std::printf("command not found: %s\n", program.c_str());
+		std::printf("shell: command not found: %s\n", program.c_str());
 	}
 
 	std::exit(0);
