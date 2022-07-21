@@ -3,19 +3,25 @@
 #include <unordered_map>
 #include <fs>
 #include <tasks>
+#include <users>
 
-static const char* user = "system";
 static const char* prompt = "\033\x0E[\033\x0C%s\033\x0E %s] $ \033\x0A";
 
 std::unordered_map<std::string, std::string> env;
+size_t lastExitValue = 0;
 
 extern "C" void _start() {
+	// Who am I?
+	auto info = std::info(std::getPID());
+	auto user = std::uidToName(info.uid);
+	const char* username = user.c_str();
+
 	env["PWD"] = "/";
 	env["PATH"] = "/cd/bin";
 	initBuiltins();
 
 	while(true) {
-		std::printf(prompt, user, env["PWD"].c_str());
+		std::printf(prompt, username, env["PWD"].c_str());
 		std::flushTerm();
 
 		auto line = getLine();
@@ -71,6 +77,11 @@ extern "C" void _start() {
 				}
 
 				std::wait(pid);
+				size_t kr = std::getKillReason(pid);
+				if(kr == std::kkill::OK)
+					lastExitValue = std::getExitValue(pid);
+				else
+					printKR(pid, kr);
 				break;
 			}
 		}

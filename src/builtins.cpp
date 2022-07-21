@@ -43,9 +43,15 @@ static void cd(std::Args& args) {
 	env["PWD"] = pwd;
 }
 
+static void lev(std::Args& args) {
+	IGNORE(args);
+	std::printf("%d\n", lastExitValue);
+}
+
 void initBuiltins() {
 	builtins["exit"] = exit;
 	builtins["pwd"] = pwd;
 	builtins["clear"] = clear;
 	builtins["cd"] = cd;
+	builtins["lev"] = lev;
 }
