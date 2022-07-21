@@ -17,6 +17,11 @@ std::string getLine() {
 
 	while(true) {
 		char c = getChar();
+		if(!c) {
+			std::printf("shell: could not read from keyboard\n");
+			std::printf("Hint: does this user have the KEYBOARD permission?\n");
+			std::exit(100);
+		}
 
 		if(c == '\b') {
 			if(ret.size()) {
